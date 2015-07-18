@@ -3,7 +3,7 @@
 #include <vector>
 #include "sgfilter.h"
 
-#define size 9
+#define size 5
 #define deriv 1
 #define order 2
 
