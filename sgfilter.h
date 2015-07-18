@@ -7,7 +7,6 @@
 #include <vector>
 #include "gsl/gsl_math.h"
 #include "gsl/gsl_matrix.h"
-#include <armadillo>
 #include "gsl/gsl_permutation.h"
 #include "gsl/gsl_linalg.h"
 #include "gsl/gsl_blas.h"

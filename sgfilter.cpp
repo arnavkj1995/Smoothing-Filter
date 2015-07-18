@@ -66,46 +66,25 @@ std::vector<float> SgFilter::sg_filter(std::vector<float> x, int order, int deri
 	int xSize = x.size();
 	//gsl to be used from here for calculating pseudo inverse
 	// matrix to be initialised
-	gsl_matrix * m = gsl_matrix_alloc (xSize, xSize);
+	gsl_matrix * m = gsl_matrix_alloc (xSize, order + 1);
 	for(int i = 0 ; i < xSize ; i++){
 		float val = 1;
-		for(int j = 0 ; j < xSize ; j++){
+		for(int j = 0 ; j < order + 1 ; j++){
 			gsl_matrix_set (m, i, j, val);
 			val *= (x[i] - x[xMid]);
 		}
 	}
-
 	// making the transpose matrix
-	gsl_matrix * a = gsl_matrix_alloc (xSize, xSize);
+	gsl_matrix * a = gsl_matrix_alloc (order + 1, xSize);
+	gsl_matrix_transpose_memcpy (a, m);
+
 	//calculating pseudo inverse of a
+	gsl_matrix * b = pseudoInverse(a, order + 1, xSize);
 	
-
-	gsl_matrix * b = pseudoInverse(a, xSize, xSize);
-	/*
-	for(int i = 0 ; i < xSize ; i++){
-		for(int j = 0 ; j < xSize ; j++){
-			gsl_matrix_set (b, j , i, gsl_matrix_get (a, i, j));
-		}
-	}
-
-	gsl_matrix * c = gsl_matrix_alloc (xSize, xSize);
-	for(int i = 0 ; i < xSize ; i++){
-		for(int j = 0 ; j < xSize ; j++){
-			float val = 0;
-			for(int k = 0 ; k < xSize ; k++){
-				val += gsl_matrix_get(b, i , k)*gsl_matrix_get(a, k, j);
-			}
-			gsl_matrix_set (c, i, j, val);
-		}
-	}
-
-	//int x =  gsl_linalg_LU_invert (const gsl_matrix * LU, const gsl_permutation * p, gsl_matrix * inverse)
-//using armadillo	
-	// using namespace arma;
-	// double *matrix = new double [xSize*xSize];
-	// arma::mat arma_matrix( matrix, xSize, xSize, true, true );
-*/
-		
+	std::vector<float> ans;
+	for(int i = 0 ; i < xSize ; i++)
+		ans.push_back(gsl_matrix_get(b, i, deriv));
+	return ans;	
 
 }
 
@@ -120,15 +99,17 @@ float SgFilter::smooth(std::vector<float> x, std::vector<float> y, int size, int
 	assert(deriv <= order);
 	int start = 0;
 	int end = 2*size + 1;
-	// std::vector<float> f = sg_filter(x, order, deriv);
+//	std::cout << "got it 1" << std::endl;
+	std::vector<float> f = sg_filter(x, order, deriv);
+//	std::cout << "got it 2" << std::endl;
 
 	 float result = 0;
-	// for(int i = 0 ; i < f.size() ; i++){
-	// 	result += f[i]*y[i];
-	// }
+	for(int i = 0 ; i < f.size() ; i++){
+	 	result += f[i]*y[i];
+	}
 
-	// if(deriv > 1)
-	// 	result *= factorial(deriv);
+	if(deriv > 1)
+	 	result *= factorial(deriv);
 
 	return result;
 }

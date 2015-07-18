@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp sgfilter.cpp -o sg -lgsl -lgslcblas -larmadillo
+	g++ main.cpp sgfilter.cpp -o sg -lgsl -lgslcblas
